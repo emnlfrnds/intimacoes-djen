@@ -31,7 +31,8 @@ export class Intimacao {
   @Column()
   tipoComunicacao: string;
 
-  @Column({ nullable: true })
+  // type explícito: com "string | null" o TS emite "Object" e o TypeORM não sabe o tipo
+  @Column({ type: 'varchar', nullable: true })
   nomeOrgao: string | null;
 
   @Column({ type: 'date' })
