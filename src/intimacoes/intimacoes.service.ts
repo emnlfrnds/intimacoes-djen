@@ -11,6 +11,7 @@ import { DjenClient, type OrigemDados } from '../djen/djen.client.js';
 import type { DjenItem } from '../djen/djen.types.js';
 import { SincronizarIntimacoesDto } from './dto/sincronizar-intimacoes.dto.js';
 import { Intimacao, StatusIntimacao } from './entities/intimacao.entity.js';
+import { paraVisao } from './intimacao.visao.js';
 
 type NovaIntimacao = Omit<
   Intimacao,
@@ -92,12 +93,13 @@ export class IntimacoesService {
     return resumo;
   }
 
-  listar() {
-    return this.intimacaoRepository.find({
+  async listar() {
+    const intimacoes = await this.intimacaoRepository.find({
       relations: { colaborador: true },
       order: { id: 'DESC' },
       take: 50,
     });
+    return intimacoes.map(paraVisao);
   }
 
   // Reprocessa as que ficaram sem dono (ex.: sync rodou sem colaborador ativo)
@@ -122,7 +124,7 @@ export class IntimacoesService {
       throw new NotFoundException(`Intimação ${id} não encontrada`);
     }
     intimacao.status = StatusIntimacao.CONCLUIDA;
-    return this.intimacaoRepository.save(intimacao);
+    return paraVisao(await this.intimacaoRepository.save(intimacao));
   }
 
   // for...of com await, e NÃO Promise.all: cada escolha depende da fila que a

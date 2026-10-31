@@ -7,6 +7,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { ColaboradorModule } from './colaborador/colaborador.module.js';
 import { IntimacoesModule } from './intimacoes/intimacoes.module.js';
+import { NotificacaoModule } from './notificacao/notificacao.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -35,6 +36,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     }),
     ColaboradorModule,
     IntimacoesModule,
+    NotificacaoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
