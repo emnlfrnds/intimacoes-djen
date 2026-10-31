@@ -1,0 +1,382 @@
+{
+  "status": "success",
+  "message": "Sucesso",
+  "count": 10000,
+  "items": [
+    {
+      "id": 900001,
+      "data_disponibilizacao": "2026-10-30",
+      "siglaTribunal": "TJSP",
+      "tipoComunicacao": "Citação",
+      "nomeOrgao": "1ª Vara Cível da Comarca Exemplo",
+      "idOrgao": 990001,
+      "texto": "<html><body><p>Intimação fictícia nº 1 destinada a <b>PARTE 1</b>.</p><img src=x onerror=\"alert('XSS')\"></body></html>",
+      "numero_processo": "00000010020268260000",
+      "meio": "D",
+      "link": "https://exemplo.invalid/processo",
+      "tipoDocumento": "Ato ordinatório",
+      "nomeClasse": "MONITóRIA",
+      "codigoClasse": "40",
+      "numeroComunicacao": 1,
+      "ativo": true,
+      "hash": "mock-hash-1",
+      "status": "P",
+      "motivo_cancelamento": null,
+      "data_cancelamento": null,
+      "datadisponibilizacao": "30/10/2026",
+      "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+      "numeroprocessocommascara": "0000001-00.2026.8.26.0000",
+      "destinatarios": [
+        {
+          "comunicacao_id": 900001,
+          "nome": "PARTE 1-1",
+          "polo": "P"
+        },
+        {
+          "comunicacao_id": 900001,
+          "nome": "PARTE 1-2",
+          "polo": "A"
+        }
+      ],
+      "destinatarioadvogados": [
+        {
+          "id": 700010,
+          "comunicacao_id": 900001,
+          "advogado_id": 800000,
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00",
+          "advogado": {
+            "id": 800000,
+            "nome": "ADVOGADO(A) 1",
+            "numero_oab": "100000",
+            "uf_oab": "SP"
+          }
+        }
+      ]
+    },
+    {
+      "id": 900002,
+      "data_disponibilizacao": "2026-10-30",
+      "siglaTribunal": "TJSP",
+      "tipoComunicacao": "Edital",
+      "nomeOrgao": "2ª Vara Cível da Comarca Exemplo",
+      "idOrgao": 990002,
+      "texto": "<html><body><p>Intimação fictícia nº 2 destinada a <b>PARTE 2</b>.</p></body></html>",
+      "numero_processo": "00000020020268260000",
+      "meio": "E",
+      "link": "https://exemplo.invalid/processo",
+      "tipoDocumento": "Edital",
+      "nomeClasse": "PROCEDIMENTO COMUM CíVEL",
+      "codigoClasse": "7",
+      "numeroComunicacao": 2,
+      "ativo": true,
+      "hash": "mock-hash-2",
+      "status": "P",
+      "motivo_cancelamento": null,
+      "data_cancelamento": null,
+      "datadisponibilizacao": "30/10/2026",
+      "meiocompleto": "Plataforma Nacional de Editais",
+      "numeroprocessocommascara": "0000002-00.2026.8.26.0000",
+      "destinatarios": [
+        {
+          "comunicacao_id": 900002,
+          "nome": "PARTE 2-1",
+          "polo": "A"
+        },
+        {
+          "comunicacao_id": 900002,
+          "nome": "PARTE 2-2",
+          "polo": "P"
+        }
+      ],
+      "destinatarioadvogados": [
+        {
+          "id": 700020,
+          "comunicacao_id": 900002,
+          "advogado_id": 800000,
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00",
+          "advogado": {
+            "id": 800000,
+            "nome": "ADVOGADO(A) 1",
+            "numero_oab": "100000",
+            "uf_oab": "SP"
+          }
+        },
+        {
+          "id": 700021,
+          "comunicacao_id": 900002,
+          "advogado_id": 800001,
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00",
+          "advogado": {
+            "id": 800001,
+            "nome": "ADVOGADO(A) 2",
+            "numero_oab": "100001",
+            "uf_oab": "SP"
+          }
+        },
+        {
+          "id": 700022,
+          "comunicacao_id": 900002,
+          "advogado_id": 800002,
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00",
+          "advogado": {
+            "id": 800002,
+            "nome": "ADVOGADO(A) 3",
+            "numero_oab": "100002",
+            "uf_oab": "SP"
+          }
+        }
+      ]
+    },
+    {
+      "id": 900003,
+      "data_disponibilizacao": "2026-10-30",
+      "siglaTribunal": "TJSP",
+      "tipoComunicacao": "Citação",
+      "nomeOrgao": "3ª Vara Cível da Comarca Exemplo",
+      "idOrgao": 990003,
+      "texto": "<html><body><p>Intimação fictícia nº 3 destinada a <b>PARTE 3</b>.</p></body></html>",
+      "numero_processo": "00000030020268260000",
+      "meio": "D",
+      "link": "https://exemplo.invalid/processo",
+      "tipoDocumento": "Ato ordinatório",
+      "nomeClasse": "INCIDENTE DE DESCONSIDERAçãO DE PERSONALIDADE JURíDICA",
+      "codigoClasse": "12119",
+      "numeroComunicacao": 3,
+      "ativo": true,
+      "hash": "mock-hash-3",
+      "status": "P",
+      "motivo_cancelamento": null,
+      "data_cancelamento": null,
+      "datadisponibilizacao": "30/10/2026",
+      "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+      "numeroprocessocommascara": "0000003-00.2026.8.26.0000",
+      "destinatarios": [
+        {
+          "comunicacao_id": 900003,
+          "nome": "PARTE 3-1",
+          "polo": "A"
+        },
+        {
+          "comunicacao_id": 900003,
+          "nome": "PARTE 3-2",
+          "polo": "P"
+        },
+        {
+          "comunicacao_id": 900003,
+          "nome": "PARTE 3-3",
+          "polo": "P"
+        },
+        {
+          "comunicacao_id": 900003,
+          "nome": "PARTE 3-4",
+          "polo": "P"
+        },
+        {
+          "comunicacao_id": 900003,
+          "nome": "PARTE 3-5",
+          "polo": "P"
+        },
+        {
+          "comunicacao_id": 900003,
+          "nome": "PARTE 3-6",
+          "polo": "P"
+        },
+        {
+          "comunicacao_id": 900003,
+          "nome": "PARTE 3-7",
+          "polo": "P"
+        },
+        {
+          "comunicacao_id": 900003,
+          "nome": "PARTE 3-8",
+          "polo": "P"
+        },
+        {
+          "comunicacao_id": 900003,
+          "nome": "PARTE 3-9",
+          "polo": "P"
+        },
+        {
+          "comunicacao_id": 900003,
+          "nome": "PARTE 3-10",
+          "polo": "P"
+        }
+      ],
+      "destinatarioadvogados": [
+        {
+          "id": 700030,
+          "comunicacao_id": 900003,
+          "advogado_id": 800000,
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00",
+          "advogado": {
+            "id": 800000,
+            "nome": "ADVOGADO(A) 1",
+            "numero_oab": "100000",
+            "uf_oab": "SP"
+          }
+        },
+        {
+          "id": 700031,
+          "comunicacao_id": 900003,
+          "advogado_id": 800001,
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00",
+          "advogado": {
+            "id": 800001,
+            "nome": "ADVOGADO(A) 2",
+            "numero_oab": "100001",
+            "uf_oab": "SP"
+          }
+        }
+      ]
+    },
+    {
+      "id": 900004,
+      "data_disponibilizacao": "2026-10-30",
+      "siglaTribunal": "TJSP",
+      "tipoComunicacao": "Edital",
+      "nomeOrgao": "4ª Vara Cível da Comarca Exemplo",
+      "idOrgao": 990004,
+      "texto": "<html><body><p>Intimação fictícia nº 4 destinada a <b>PARTE 4</b>.</p></body></html>",
+      "numero_processo": "00000040020268260000",
+      "meio": "E",
+      "link": "https://exemplo.invalid/processo",
+      "tipoDocumento": "Edital",
+      "nomeClasse": "EXECUçãO DE TíTULO EXTRAJUDICIAL",
+      "codigoClasse": "12154",
+      "numeroComunicacao": 4,
+      "ativo": true,
+      "hash": "mock-hash-4",
+      "status": "P",
+      "motivo_cancelamento": null,
+      "data_cancelamento": null,
+      "datadisponibilizacao": "30/10/2026",
+      "meiocompleto": "Plataforma Nacional de Editais",
+      "numeroprocessocommascara": "0000004-00.2026.8.26.0000",
+      "destinatarios": [
+        {
+          "comunicacao_id": 900004,
+          "nome": "PARTE 4-1",
+          "polo": "P"
+        },
+        {
+          "comunicacao_id": 900004,
+          "nome": "PARTE 4-2",
+          "polo": "A"
+        },
+        {
+          "comunicacao_id": 900004,
+          "nome": "PARTE 4-3",
+          "polo": "P"
+        }
+      ],
+      "destinatarioadvogados": [
+        {
+          "id": 700040,
+          "comunicacao_id": 900004,
+          "advogado_id": 800000,
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00",
+          "advogado": {
+            "id": 800000,
+            "nome": "ADVOGADO(A) 1",
+            "numero_oab": "100000",
+            "uf_oab": "SP"
+          }
+        },
+        {
+          "id": 700041,
+          "comunicacao_id": 900004,
+          "advogado_id": 800001,
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00",
+          "advogado": {
+            "id": 800001,
+            "nome": "ADVOGADO(A) 2",
+            "numero_oab": "100001",
+            "uf_oab": "SP"
+          }
+        },
+        {
+          "id": 700042,
+          "comunicacao_id": 900004,
+          "advogado_id": 800002,
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00",
+          "advogado": {
+            "id": 800002,
+            "nome": "ADVOGADO(A) 3",
+            "numero_oab": "100002",
+            "uf_oab": "SP"
+          }
+        }
+      ]
+    },
+    {
+      "id": 900005,
+      "data_disponibilizacao": "2026-10-30",
+      "siglaTribunal": "TJSP",
+      "tipoComunicacao": "Citação",
+      "nomeOrgao": "5ª Vara Cível da Comarca Exemplo",
+      "idOrgao": 990005,
+      "texto": "<html><body><p>Intimação fictícia nº 5 destinada a <b>PARTE 5</b>.</p></body></html>",
+      "numero_processo": "00000050020268260000",
+      "meio": "D",
+      "link": "https://exemplo.invalid/processo",
+      "tipoDocumento": "Ato ordinatório",
+      "nomeClasse": "PROCEDIMENTO COMUM CíVEL",
+      "codigoClasse": "7",
+      "numeroComunicacao": 5,
+      "ativo": true,
+      "hash": "mock-hash-5",
+      "status": "P",
+      "motivo_cancelamento": null,
+      "data_cancelamento": null,
+      "datadisponibilizacao": "30/10/2026",
+      "meiocompleto": "Diário de Justiça Eletrônico Nacional",
+      "numeroprocessocommascara": "0000005-00.2026.8.26.0000",
+      "destinatarios": [
+        {
+          "comunicacao_id": 900005,
+          "nome": "PARTE 5-1",
+          "polo": "A"
+        },
+        {
+          "comunicacao_id": 900005,
+          "nome": "PARTE 5-2",
+          "polo": "P"
+        },
+        {
+          "comunicacao_id": 900005,
+          "nome": "PARTE 5-3",
+          "polo": "A"
+        },
+        {
+          "comunicacao_id": 900005,
+          "nome": "PARTE 5-4",
+          "polo": "P"
+        }
+      ],
+      "destinatarioadvogados": [
+        {
+          "id": 700050,
+          "comunicacao_id": 900005,
+          "advogado_id": 800000,
+          "created_at": "2026-01-01T00:00:00",
+          "updated_at": "2026-01-01T00:00:00",
+          "advogado": {
+            "id": 800000,
+            "nome": "ADVOGADO(A) 1",
+            "numero_oab": "100000",
+            "uf_oab": "SP"
+          }
+        }
+      ]
+    }
+  ]
+}
