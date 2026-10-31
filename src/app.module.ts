@@ -3,18 +3,28 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { createObserveModule } from '@nestjs/observe';
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
 import { ColaboradorModule } from './colaborador/colaborador.module.js';
 import { IntimacoesModule } from './intimacoes/intimacoes.module.js';
 import { NotificacaoModule } from './notificacao/notificacao.module.js';
+import { SegurancaModule } from './seguranca/seguranca.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
+
+// Falha no boot, e não na primeira requisição, se a chave faltar ou for fraca
+function validarAmbiente(env: Record<string, unknown>) {
+  const apiKey = env.API_KEY;
+  if (typeof apiKey !== 'string' || apiKey.length < 32) {
+    throw new Error(
+      'API_KEY ausente ou curta no .env (mínimo de 32 caracteres aleatórios)',
+    );
+  }
+  return env;
+}
 
 @Module({
   imports: [
     // Precisa vir primeiro: carrega o .env antes do ObserveModule ler process.env
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, validate: validarAmbiente }),
     ObserveModule.forRoot({
       appKey: process.env.OBSERVE_APP_KEY ?? 'YOUR_APP_KEY',
       appSecret: process.env.OBSERVE_APP_SECRET ?? 'YOUR_APP_SECRET',
@@ -37,8 +47,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     ColaboradorModule,
     IntimacoesModule,
     NotificacaoModule,
+    SegurancaModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

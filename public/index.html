@@ -401,6 +401,43 @@
         border-radius: var(--raio);
       }
 
+      /* ---------- Login ---------- */
+      .login {
+        width: min(400px, calc(100vw - 32px));
+        padding: 24px;
+        border: 1px solid var(--borda);
+        border-radius: var(--raio);
+        background: var(--superficie);
+        color: var(--texto);
+        box-shadow: var(--sombra-alta);
+      }
+
+      .login::backdrop {
+        background: rgb(10 14 20 / 55%);
+        backdrop-filter: blur(3px);
+      }
+
+      .login h2 {
+        margin: 0 0 4px;
+        font-size: 18px;
+      }
+
+      .login p {
+        margin: 0 0 16px;
+        font-size: 13px;
+        color: var(--texto-suave);
+      }
+
+      .login form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .login .campo {
+        width: 100%;
+        font-family: var(--mono);
+      }
+
       /* ---------- Toasts ---------- */
       .toasts {
         position: fixed;
@@ -554,6 +591,8 @@
           Ativar notificações
         </button>
 
+        <button id="btn-sair" class="botao" type="button" hidden>Sair</button>
+
         <form id="form-sync" class="sync">
           <input
             id="sigla"
@@ -601,6 +640,24 @@
         <div id="intimacoes" class="grade-intim"></div>
       </section>
     </main>
+
+    <dialog id="login" class="login" aria-labelledby="login-titulo">
+      <h2 id="login-titulo">Entrar</h2>
+      <p>Informe a API key do sistema (variável API_KEY do servidor).</p>
+      <form id="form-login">
+        <input
+          id="chave"
+          class="campo"
+          type="password"
+          aria-label="API key"
+          autocomplete="off"
+          required
+        />
+        <button id="btn-entrar" class="botao botao--primario" type="submit">
+          Entrar
+        </button>
+      </form>
+    </dialog>
 
     <div id="toasts" class="toasts"></div>
 
@@ -674,10 +731,54 @@
           const msg = Array.isArray(corpo?.message)
             ? corpo.message.join('; ')
             : corpo?.message;
-          throw new Error(msg || `HTTP ${resposta.status}`);
+          const erro = new Error(msg || `HTTP ${resposta.status}`);
+          erro.status = resposta.status;
+          // Sessão ausente ou expirada: volta para a tela de login
+          if (resposta.status === 401) abrirLogin();
+          throw erro;
         }
         return corpo;
       }
+
+      // ---------- Login ----------
+      // A API key só existe no campo durante o envio: o servidor devolve um
+      // cookie HttpOnly e a página nunca guarda a chave (nem em localStorage)
+      function abrirLogin() {
+        fecharSse();
+        $('#btn-sair').hidden = true;
+        const dialogo = $('#login');
+        if (!dialogo.open) dialogo.showModal();
+        $('#chave').focus();
+      }
+
+      $('#form-login').addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+        const botao = $('#btn-entrar');
+        botao.disabled = true;
+        try {
+          const resposta = await fetch('/auth/sessao', {
+            method: 'POST',
+            headers: { 'x-api-key': $('#chave').value },
+          });
+          if (resposta.status === 429) throw new Error('Muitas tentativas. Aguarde um minuto.');
+          if (!resposta.ok) throw new Error('API key inválida');
+          $('#chave').value = '';
+          $('#login').close();
+          await iniciar();
+        } catch (erro) {
+          toast('Não foi possível entrar', erro.message, 'erro');
+        } finally {
+          botao.disabled = false;
+        }
+      });
+
+      $('#btn-sair').addEventListener('click', async () => {
+        await fetch('/auth/sair', { method: 'POST' });
+        abrirLogin();
+      });
+
+      // Esc não pode fechar o login e deixar a tela vazia sem sessão
+      $('#login').addEventListener('cancel', (evento) => evento.preventDefault());
 
       // ---------- Colaboradores ----------
       async function carregarColaboradores() {
@@ -887,8 +988,21 @@
         $('#sse-texto').textContent = conectado ? 'Conectado' : 'Reconectando…';
       }
 
+      // LIMITAÇÃO: o EventSource não aceita headers, então não dá para mandar
+      // Authorization nem x-api-key. A autenticação do stream vem do cookie
+      // HttpOnly de sessão, que o navegador envia sozinho para o mesmo site
+      let fonte = null;
+
+      function fecharSse() {
+        fonte?.close();
+        fonte = null;
+        indicarSse(false);
+        $('#sse-texto').textContent = 'Desconectado';
+      }
+
       function conectarSse() {
-        const fonte = new EventSource('/notificacoes/stream');
+        fecharSse();
+        fonte = new EventSource('/notificacoes/stream');
         let caiu = false;
 
         fonte.onopen = () => {
@@ -896,10 +1010,15 @@
           // O servidor não reenvia o que se perdeu: ao voltar, recarregamos tudo
           if (caiu) void carregarTudo();
         };
-        // O EventSource reconecta sozinho; só mostramos o estado
         fonte.onerror = () => {
           caiu = true;
           indicarSse(false);
+          // Rede caiu: o EventSource reconecta sozinho. Mas se o servidor
+          // respondeu erro (ex.: 401 de sessão expirada) ele DESISTE (CLOSED).
+          // Uma chamada à API descobre qual foi e abre o login se for 401
+          if (fonte?.readyState === EventSource.CLOSED) {
+            setTimeout(() => void iniciar(), 3000);
+          }
         };
 
         fonte.addEventListener('intimacao.atribuida', (mensagem) => {
@@ -950,15 +1069,25 @@
       async function carregarTudo() {
         try {
           await Promise.all([carregarColaboradores(), carregarIntimacoes()]);
+          return true;
         } catch (erro) {
-          toast('Falha ao carregar dados', erro.message, 'erro');
+          // 401 já abriu o login; não precisa de toast
+          if (erro.status !== 401) toast('Falha ao carregar dados', erro.message, 'erro');
+          return false;
+        }
+      }
+
+      // O SSE só abre depois de confirmar a sessão: sem ela, o stream daria 401
+      async function iniciar() {
+        if (await carregarTudo()) {
+          $('#btn-sair').hidden = false;
+          conectarSse();
         }
       }
 
       $('#data').value = ultimoDiaUtil();
       atualizarBotaoNotificacao();
-      void carregarTudo();
-      conectarSse();
+      void iniciar();
     </script>
   </body>
 </html>
