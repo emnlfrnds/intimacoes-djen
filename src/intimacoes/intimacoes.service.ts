@@ -1,12 +1,21 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
+import { DistribuicaoService } from '../distribuicao/distribuicao.service.js';
 import { DjenClient, type OrigemDados } from '../djen/djen.client.js';
 import type { DjenItem } from '../djen/djen.types.js';
 import { SincronizarIntimacoesDto } from './dto/sincronizar-intimacoes.dto.js';
-import { Intimacao } from './entities/intimacao.entity.js';
+import { Intimacao, StatusIntimacao } from './entities/intimacao.entity.js';
 
-type NovaIntimacao = Omit<Intimacao, 'id' | 'status' | 'criadaEm'>;
+type NovaIntimacao = Omit<
+  Intimacao,
+  'id' | 'status' | 'criadaEm' | 'colaborador'
+>;
 
 const NUMERO_CNJ = /^\d{20}$/;
 const DATA = /^\d{4}-\d{2}-\d{2}$/;
@@ -21,6 +30,7 @@ export class IntimacoesService {
     @InjectRepository(Intimacao)
     private readonly intimacaoRepository: Repository<Intimacao>,
     private readonly djenClient: DjenClient,
+    private readonly distribuicaoService: DistribuicaoService,
   ) {}
 
   async sincronizar(dto: SincronizarIntimacoesDto) {
@@ -46,6 +56,7 @@ export class IntimacoesService {
       novas: 0,
       duplicadas: 0,
       invalidas: 0,
+      atribuidas: 0,
     };
 
     // Uma página por vez (await dentro do for): respeita o rate limit do DJEN
@@ -69,6 +80,9 @@ export class IntimacoesService {
       const inseridas = await this.inserirSemDuplicar(validas);
       resumo.novas += inseridas.length;
       resumo.duplicadas += validas.length - inseridas.length;
+      resumo.atribuidas += await this.distribuirEmSequencia(
+        inseridas.map(({ id }) => id),
+      );
 
       // Página incompleta = acabou
       if (dados.items.length < itensPorPagina) break;
@@ -79,7 +93,56 @@ export class IntimacoesService {
   }
 
   listar() {
-    return this.intimacaoRepository.find({ order: { id: 'DESC' }, take: 50 });
+    return this.intimacaoRepository.find({
+      relations: { colaborador: true },
+      order: { id: 'DESC' },
+      take: 50,
+    });
+  }
+
+  // Reprocessa as que ficaram sem dono (ex.: sync rodou sem colaborador ativo)
+  async distribuirPendentes() {
+    const semDono = await this.intimacaoRepository.find({
+      select: { id: true },
+      where: { colaborador: IsNull(), status: StatusIntimacao.PENDENTE },
+      order: { id: 'ASC' },
+    });
+    const atribuidas = await this.distribuirEmSequencia(
+      semDono.map(({ id }) => id),
+    );
+    return { encontradas: semDono.length, atribuidas };
+  }
+
+  async concluir(id: number) {
+    const intimacao = await this.intimacaoRepository.findOne({
+      where: { id },
+      relations: { colaborador: true },
+    });
+    if (!intimacao) {
+      throw new NotFoundException(`Intimação ${id} não encontrada`);
+    }
+    intimacao.status = StatusIntimacao.CONCLUIDA;
+    return this.intimacaoRepository.save(intimacao);
+  }
+
+  // for...of com await, e NÃO Promise.all: cada escolha depende da fila que a
+  // anterior acabou de gravar. Em paralelo, todas as transações disputariam a
+  // mesma trava (ordem imprevisível) e prenderiam várias conexões do pool à toa.
+  private async distribuirEmSequencia(ids: number[]) {
+    let atribuidas = 0;
+    for (const id of ids) {
+      try {
+        if (await this.distribuicaoService.distribuir(id)) atribuidas++;
+      } catch (erro) {
+        // Uma falha não derruba o lote: a intimação fica sem dono e pode ser
+        // reprocessada em POST /intimacoes/distribuir-pendentes
+        this.logger.error(
+          `Falha ao distribuir a intimação ${id}`,
+          erro instanceof Error ? erro.stack : String(erro),
+        );
+      }
+    }
+    return atribuidas;
   }
 
   // ON CONFLICT DO NOTHING: o UNIQUE de djenId descarta as repetidas sem erro,

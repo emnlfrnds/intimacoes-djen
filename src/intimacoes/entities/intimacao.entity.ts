@@ -2,14 +2,20 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
+  ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
 } from 'typeorm';
+import { Colaborador } from '../../colaborador/entities/colaborador.entity.js';
 
 export enum StatusIntimacao {
   PENDENTE = 'PENDENTE',
   CONCLUIDA = 'CONCLUIDA',
 }
 
+// A distribuição conta "pendentes por colaborador" a cada atribuição: este índice serve essa contagem
+@Index(['colaborador', 'status'])
 @Entity('intimacoes')
 export class Intimacao {
   @PrimaryGeneratedColumn()
@@ -51,6 +57,12 @@ export class Intimacao {
     default: StatusIntimacao.PENDENTE,
   })
   status: StatusIntimacao;
+
+  // null enquanto não há colaborador ativo para receber
+  @ManyToOne(() => Colaborador, (colaborador) => colaborador.intimacoes, {
+    nullable: true,
+  })
+  colaborador: Relation<Colaborador> | null;
 
   @CreateDateColumn({ type: 'timestamptz' })
   criadaEm: Date;

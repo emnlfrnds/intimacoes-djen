@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { SincronizarIntimacoesDto } from './dto/sincronizar-intimacoes.dto.js';
 import { IntimacoesService } from './intimacoes.service.js';
 
@@ -13,8 +22,20 @@ export class IntimacoesController {
     return this.intimacoesService.sincronizar(dto);
   }
 
+  @Post('distribuir-pendentes')
+  @HttpCode(200)
+  distribuirPendentes() {
+    return this.intimacoesService.distribuirPendentes();
+  }
+
   @Get()
   listar() {
     return this.intimacoesService.listar();
+  }
+
+  // ParseIntPipe: "abc" vira 400 em vez de chegar como NaN no service
+  @Patch(':id/concluir')
+  concluir(@Param('id', ParseIntPipe) id: number) {
+    return this.intimacoesService.concluir(id);
   }
 }

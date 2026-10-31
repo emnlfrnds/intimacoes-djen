@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { ColaboradorModule } from './colaborador/colaborador.module.js';
 import { IntimacoesModule } from './intimacoes/intimacoes.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
@@ -32,6 +33,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
         synchronize: true, // só para o hackathon; em produção usaríamos migrations
       }),
     }),
+    ColaboradorModule,
     IntimacoesModule,
   ],
   controllers: [AppController],
