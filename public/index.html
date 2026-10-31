@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Intimações DJEN</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f4f6f9;
+        --superficie: #ffffff;
+        --superficie-2: #f8f9fb;
+        --borda: #e2e6ec;
+        --texto: #18202b;
+        --texto-suave: #5b6676;
+        --primaria: #2457d6;
+        --primaria-hover: #1c47b3;
+        --primaria-texto: #ffffff;
+        --sucesso: #1a8f4c;
+        --aviso: #b7791f;
+        --perigo: #c93838;
+        --destaque: #fff3c4;
+        --tag-tribunal-bg: #e7eeff;
+        --tag-tribunal-tx: #1d43a3;
+        --tag-tipo-bg: #e9f6ee;
+        --tag-tipo-tx: #1b6a3b;
+        --sombra: 0 1px 2px rgb(16 24 40 / 6%), 0 2px 6px rgb(16 24 40 / 6%);
+        --sombra-alta: 0 8px 24px rgb(16 24 40 / 16%);
+        --raio: 12px;
+        --fonte: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        --mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0e131a;
+          --superficie: #161c25;
+          --superficie-2: #1b2230;
+          --borda: #273142;
+          --texto: #e5e9f0;
+          --texto-suave: #97a2b2;
+          --primaria: #5b8cff;
+          --primaria-hover: #7aa2ff;
+          --primaria-texto: #0b1020;
+          --sucesso: #3cc977;
+          --aviso: #f0b44c;
+          --perigo: #ff6b6b;
+          --destaque: #3b3315;
+          --tag-tribunal-bg: #1c2948;
+          --tag-tribunal-tx: #a8c0ff;
+          --tag-tipo-bg: #16301f;
+          --tag-tipo-tx: #8fdcaa;
+          --sombra: 0 1px 2px rgb(0 0 0 / 40%);
+          --sombra-alta: 0 8px 24px rgb(0 0 0 / 50%);
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--texto);
+        font: 15px/1.5 var(--fonte);
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+        color: inherit;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--primaria);
+        outline-offset: 2px;
+      }
+
+      /* ---------- Cabeçalho ---------- */
+      .topo {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--superficie);
+        border-bottom: 1px solid var(--borda);
+      }
+
+      .topo__conteudo {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 14px 20px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px 20px;
+      }
+
+      .marca {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-right: auto;
+      }
+
+      .marca__icone {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: var(--primaria);
+        color: var(--primaria-texto);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+      }
+
+      .marca h1 {
+        margin: 0;
+        font-size: 17px;
+        line-height: 1.2;
+      }
+
+      .marca p {
+        margin: 0;
+        font-size: 12px;
+        color: var(--texto-suave);
+      }
+
+      .sse {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--texto-suave);
+      }
+
+      .sse__bolinha {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--perigo);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--perigo) 22%, transparent);
+      }
+
+      .sse--conectado .sse__bolinha {
+        background: var(--sucesso);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--sucesso) 22%, transparent);
+      }
+
+      .sse--reconectando .sse__bolinha {
+        animation: piscar 1s ease-in-out infinite;
+      }
+
+      .sync {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .campo {
+        height: 36px;
+        padding: 0 10px;
+        border: 1px solid var(--borda);
+        border-radius: 8px;
+        background: var(--superficie-2);
+      }
+
+      .campo--sigla {
+        width: 84px;
+        text-transform: uppercase;
+      }
+
+      .botao {
+        height: 36px;
+        padding: 0 14px;
+        border: 1px solid var(--borda);
+        border-radius: 8px;
+        background: var(--superficie);
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .botao:hover:not(:disabled) {
+        background: var(--superficie-2);
+      }
+
+      .botao:disabled {
+        opacity: 0.6;
+        cursor: default;
+      }
+
+      .botao--primario {
+        background: var(--primaria);
+        border-color: var(--primaria);
+        color: var(--primaria-texto);
+        font-weight: 600;
+      }
+
+      .botao--primario:hover:not(:disabled) {
+        background: var(--primaria-hover);
+      }
+
+      .botao--sutil {
+        height: 30px;
+        padding: 0 10px;
+        font-size: 13px;
+      }
+
+      /* ---------- Conteúdo ---------- */
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 20px 64px;
+      }
+
+      .secao + .secao {
+        margin-top: 32px;
+      }
+
+      .secao__titulo {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        margin: 0 0 12px;
+        font-size: 15px;
+      }
+
+      .secao__titulo small {
+        color: var(--texto-suave);
+        font-weight: 400;
+      }
+
+      .grade-colab {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 12px;
+      }
+
+      .colab {
+        background: var(--superficie);
+        border: 1px solid var(--borda);
+        border-radius: var(--raio);
+        box-shadow: var(--sombra);
+        padding: 14px 16px;
+        display: grid;
+        gap: 2px;
+      }
+
+      .colab--inativo {
+        opacity: 0.55;
+      }
+
+      .colab__nome {
+        font-weight: 600;
+      }
+
+      .colab__fila {
+        font-size: 38px;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .colab__rotulo {
+        font-size: 12px;
+        color: var(--texto-suave);
+      }
+
+      .colab--pulso .colab__fila {
+        animation: pulso 0.6s ease-out;
+      }
+
+      .grade-intim {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+        gap: 14px;
+      }
+
+      .intim {
+        background: var(--superficie);
+        border: 1px solid var(--borda);
+        border-radius: var(--raio);
+        box-shadow: var(--sombra);
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .intim--nova {
+        animation: destaque 3s ease-out;
+      }
+
+      .intim--concluida {
+        opacity: 0.6;
+      }
+
+      .intim__topo {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .intim__data {
+        margin-left: auto;
+        font-size: 12px;
+        color: var(--texto-suave);
+      }
+
+      .intim__processo {
+        margin: 0;
+        font: 600 15px/1.3 var(--mono);
+        overflow-wrap: anywhere;
+      }
+
+      .intim__orgao {
+        margin: -6px 0 0;
+        font-size: 12px;
+        color: var(--texto-suave);
+      }
+
+      .intim__trecho {
+        margin: 0;
+        color: var(--texto-suave);
+        font-size: 13.5px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        overflow-wrap: anywhere;
+      }
+
+      .intim__rodape {
+        margin-top: auto;
+        padding-top: 10px;
+        border-top: 1px solid var(--borda);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .intim__colab {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-right: auto;
+        font-size: 13px;
+        font-weight: 500;
+      }
+
+      .avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--tag-tribunal-bg);
+        color: var(--tag-tribunal-tx);
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .intim__link {
+        font-size: 13px;
+        color: var(--primaria);
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11.5px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .tag--tribunal {
+        background: var(--tag-tribunal-bg);
+        color: var(--tag-tribunal-tx);
+      }
+
+      .tag--tipo {
+        background: var(--tag-tipo-bg);
+        color: var(--tag-tipo-tx);
+      }
+
+      .tag--ok {
+        background: var(--superficie-2);
+        color: var(--texto-suave);
+        border: 1px solid var(--borda);
+      }
+
+      .vazio {
+        padding: 40px 20px;
+        text-align: center;
+        color: var(--texto-suave);
+        border: 1px dashed var(--borda);
+        border-radius: var(--raio);
+      }
+
+      /* ---------- Toasts ---------- */
+      .toasts {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: min(360px, calc(100vw - 40px));
+      }
+
+      .toast {
+        background: var(--superficie);
+        border: 1px solid var(--borda);
+        border-left: 4px solid var(--primaria);
+        border-radius: 10px;
+        box-shadow: var(--sombra-alta);
+        padding: 12px 14px;
+        display: grid;
+        gap: 2px;
+        animation: entrar 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+      }
+
+      .toast--sucesso {
+        border-left-color: var(--sucesso);
+      }
+
+      .toast--aviso {
+        border-left-color: var(--aviso);
+      }
+
+      .toast--erro {
+        border-left-color: var(--perigo);
+      }
+
+      .toast--saindo {
+        animation: sair 0.3s ease-in forwards;
+      }
+
+      .toast__titulo {
+        font-size: 14px;
+      }
+
+      .toast__texto {
+        font-size: 13px;
+        color: var(--texto-suave);
+        overflow-wrap: anywhere;
+      }
+
+      /* ---------- Animações ---------- */
+      @keyframes entrar {
+        from {
+          opacity: 0;
+          transform: translateX(40px) scale(0.96);
+        }
+      }
+
+      @keyframes sair {
+        to {
+          opacity: 0;
+          transform: translateX(40px);
+        }
+      }
+
+      @keyframes destaque {
+        0%,
+        40% {
+          background: var(--destaque);
+          border-color: var(--aviso);
+        }
+      }
+
+      @keyframes pulso {
+        40% {
+          transform: scale(1.25);
+          color: var(--primaria);
+        }
+      }
+
+      @keyframes piscar {
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+        }
+      }
+
+      @media (max-width: 640px) {
+        /* No celular o cabeçalho quebra em 3 linhas: fixo, ocuparia 1/4 da tela */
+        .topo {
+          position: static;
+        }
+
+        .topo__conteudo {
+          padding: 12px 16px;
+        }
+
+        main {
+          padding: 18px 16px 48px;
+        }
+
+        .sync {
+          width: 100%;
+        }
+
+        .sync .campo--data {
+          flex: 1;
+        }
+
+        .grade-colab {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grade-intim {
+          grid-template-columns: 1fr;
+        }
+
+        .toasts {
+          right: 16px;
+          bottom: 16px;
+          width: calc(100vw - 32px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topo">
+      <div class="topo__conteudo">
+        <div class="marca">
+          <div class="marca__icone" aria-hidden="true">§</div>
+          <div>
+            <h1>Intimações DJEN</h1>
+            <p>Distribuição automática para a menor fila</p>
+          </div>
+        </div>
+
+        <span id="sse" class="sse sse--reconectando" role="status">
+          <span class="sse__bolinha" aria-hidden="true"></span>
+          <span id="sse-texto">Conectando…</span>
+        </span>
+
+        <button id="btn-notificacoes" class="botao" type="button">
+          Ativar notificações
+        </button>
+
+        <form id="form-sync" class="sync">
+          <input
+            id="sigla"
+            class="campo campo--sigla"
+            aria-label="Sigla do tribunal"
+            value="TJSP"
+            maxlength="10"
+            required
+          />
+          <input
+            id="data"
+            class="campo campo--data"
+            type="date"
+            aria-label="Data de disponibilização"
+            required
+          />
+          <select id="quantidade" class="campo" aria-label="Quantidade">
+            <option value="10">10 itens</option>
+            <option value="20" selected>20 itens</option>
+            <option value="50">50 itens</option>
+          </select>
+          <button id="btn-sync" class="botao botao--primario" type="submit">
+            Sincronizar agora
+          </button>
+        </form>
+      </div>
+    </header>
+
+    <main>
+      <section class="secao" aria-labelledby="titulo-equipe">
+        <h2 id="titulo-equipe" class="secao__titulo">
+          Equipe <small>intimações pendentes por colaborador</small>
+        </h2>
+        <div id="colaboradores" class="grade-colab"></div>
+      </section>
+
+      <section class="secao" aria-labelledby="titulo-intim">
+        <h2 id="titulo-intim" class="secao__titulo">
+          Intimações <small id="total"></small>
+        </h2>
+        <p id="vazio" class="vazio" hidden>
+          Nenhuma intimação ainda. Escolha o tribunal e a data e clique em
+          “Sincronizar agora”.
+        </p>
+        <div id="intimacoes" class="grade-intim"></div>
+      </section>
+    </main>
+
+    <div id="toasts" class="toasts"></div>
+
+    <script>
+      'use strict';
+
+      // SEGURANÇA: todo texto vindo da API entra com textContent, nunca com
+      // innerHTML. O "texto" das intimações nasce como HTML no DJEN; se fosse
+      // para innerHTML, um <img src=x onerror="..."> executaria JavaScript aqui.
+
+      const MAX_TOASTS = 4;
+      const JANELA_ALERTAS_MS = 800;
+
+      const $ = (seletor) => document.querySelector(seletor);
+      const estado = { intimacoes: new Map(), sseConectado: false };
+
+      function el(tag, classe, texto) {
+        const no = document.createElement(tag);
+        if (classe) no.className = classe;
+        if (texto !== undefined && texto !== null) no.textContent = String(texto);
+        return no;
+      }
+
+      // Reinicia uma animação CSS mesmo se a classe já estiver aplicada
+      function pulsar(no, classe) {
+        no.classList.remove(classe);
+        void no.offsetWidth;
+        no.classList.add(classe);
+      }
+
+      // ---------- Formatação ----------
+      function mascararCNJ(valor) {
+        const d = String(valor ?? '').replace(/\D/g, '');
+        if (d.length !== 20) return valor ?? '';
+        return `${d.slice(0, 7)}-${d.slice(7, 9)}.${d.slice(9, 13)}.${d[13]}.${d.slice(14, 16)}.${d.slice(16)}`;
+      }
+
+      function formatarData(iso) {
+        const [ano, mes, dia] = String(iso ?? '').split('-');
+        return dia ? `${dia}/${mes}/${ano}` : '';
+      }
+
+      function iniciais(nome) {
+        if (!nome) return '?';
+        return nome
+          .split(/\s+/)
+          .slice(0, 2)
+          .map((parte) => parte[0].toUpperCase())
+          .join('');
+      }
+
+      function plural(n, singular, pluralTexto) {
+        return n === 1 ? singular : pluralTexto;
+      }
+
+      // Hoje, ou a última sexta se for fim de semana (não há publicação)
+      function ultimoDiaUtil() {
+        const d = new Date();
+        while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() - 1);
+        return d.toLocaleDateString('sv-SE');
+      }
+
+      // ---------- API ----------
+      async function api(caminho, opcoes = {}) {
+        const resposta = await fetch(caminho, {
+          ...opcoes,
+          headers: { 'Content-Type': 'application/json', ...opcoes.headers },
+        });
+        const corpo = await resposta.json().catch(() => null);
+        if (!resposta.ok) {
+          const msg = Array.isArray(corpo?.message)
+            ? corpo.message.join('; ')
+            : corpo?.message;
+          throw new Error(msg || `HTTP ${resposta.status}`);
+        }
+        return corpo;
+      }
+
+      // ---------- Colaboradores ----------
+      async function carregarColaboradores() {
+        const lista = await api('/colaboradores');
+        $('#colaboradores').replaceChildren(
+          ...lista.map((c) => {
+            const card = el('article', 'colab');
+            card.dataset.id = c.id;
+            if (!c.ativo) card.classList.add('colab--inativo');
+            card.append(
+              el('span', 'colab__nome', c.nome),
+              el('strong', 'colab__fila', c.pendentes),
+              el('span', 'colab__rotulo', plural(c.pendentes, 'pendente', 'pendentes')),
+            );
+            return card;
+          }),
+        );
+      }
+
+      function atualizarFila(colaboradorId, tamanho) {
+        // Number(): o id nunca entra cru num seletor CSS
+        const card = document.querySelector(`.colab[data-id="${Number(colaboradorId)}"]`);
+        if (!card) return void carregarColaboradores();
+        card.querySelector('.colab__fila').textContent = tamanho;
+        card.querySelector('.colab__rotulo').textContent = plural(tamanho, 'pendente', 'pendentes');
+        pulsar(card, 'colab--pulso');
+      }
+
+      // ---------- Intimações ----------
+      function cardIntimacao(i) {
+        const card = el('article', 'intim');
+        card.dataset.id = i.id;
+        if (i.status === 'CONCLUIDA') card.classList.add('intim--concluida');
+
+        const topo = el('header', 'intim__topo');
+        const data = el('time', 'intim__data', formatarData(i.dataDisponibilizacao));
+        data.dateTime = i.dataDisponibilizacao;
+        topo.append(
+          el('span', 'tag tag--tribunal', i.siglaTribunal),
+          el('span', 'tag tag--tipo', i.tipoComunicacao),
+          data,
+        );
+
+        const partes = [topo, el('h3', 'intim__processo', mascararCNJ(i.numeroProcessoMascara))];
+        if (i.nomeOrgao) partes.push(el('p', 'intim__orgao', i.nomeOrgao));
+        partes.push(el('p', 'intim__trecho', i.trecho || 'Sem texto.'));
+
+        const rodape = el('footer', 'intim__rodape');
+        const responsavel = el('span', 'intim__colab');
+        responsavel.append(
+          el('span', 'avatar', iniciais(i.colaborador?.nome)),
+          el('span', null, i.colaborador?.nome ?? 'Sem responsável'),
+        );
+        rodape.append(responsavel);
+
+        // Segunda barreira: a API já filtra, mas href só aceita https://
+        if (typeof i.link === 'string' && i.link.startsWith('https://')) {
+          const link = el('a', 'intim__link', 'Abrir');
+          link.href = i.link;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          rodape.append(link);
+        }
+
+        if (i.status === 'CONCLUIDA') {
+          rodape.append(el('span', 'tag tag--ok', 'Concluída'));
+        } else {
+          const botao = el('button', 'botao botao--sutil', 'Concluir');
+          botao.type = 'button';
+          botao.addEventListener('click', () => concluir(i.id, botao));
+          rodape.append(botao);
+        }
+
+        partes.push(rodape);
+        card.append(...partes);
+        return card;
+      }
+
+      function atualizarContagem() {
+        const total = estado.intimacoes.size;
+        $('#total').textContent = total ? `${total} ${plural(total, 'exibida', 'exibidas')}` : '';
+        $('#vazio').hidden = total > 0;
+      }
+
+      function inserirOuAtualizar(intimacao, destacar) {
+        estado.intimacoes.set(intimacao.id, intimacao);
+        const novo = cardIntimacao(intimacao);
+        const antigo = document.querySelector(`.intim[data-id="${Number(intimacao.id)}"]`);
+        if (antigo) antigo.replaceWith(novo);
+        else $('#intimacoes').prepend(novo);
+        if (destacar) pulsar(novo, 'intim--nova');
+        atualizarContagem();
+      }
+
+      async function carregarIntimacoes() {
+        const lista = await api('/intimacoes');
+        estado.intimacoes = new Map(lista.map((i) => [i.id, i]));
+        $('#intimacoes').replaceChildren(...lista.map(cardIntimacao));
+        atualizarContagem();
+      }
+
+      async function concluir(id, botao) {
+        botao.disabled = true;
+        try {
+          const atualizada = await api(`/intimacoes/${Number(id)}/concluir`, { method: 'PATCH' });
+          inserirOuAtualizar(atualizada, false);
+          await carregarColaboradores();
+        } catch (erro) {
+          botao.disabled = false;
+          toast('Não foi possível concluir', erro.message, 'erro');
+        }
+      }
+
+      // ---------- Toast ----------
+      function toast(titulo, texto, tipo = 'info') {
+        const caixa = $('#toasts');
+        while (caixa.children.length >= MAX_TOASTS) caixa.firstElementChild.remove();
+
+        const t = el('div', `toast toast--${tipo}`);
+        t.setAttribute('role', tipo === 'erro' ? 'alert' : 'status');
+        t.append(el('strong', 'toast__titulo', titulo), el('span', 'toast__texto', texto));
+        caixa.append(t);
+
+        setTimeout(() => {
+          t.classList.add('toast--saindo');
+          t.addEventListener('animationend', () => t.remove(), { once: true });
+        }, 5000);
+      }
+
+      // ---------- Notification API ----------
+      function atualizarBotaoNotificacao() {
+        const botao = $('#btn-notificacoes');
+        if (!('Notification' in window)) {
+          botao.hidden = true;
+          return;
+        }
+        const permissao = Notification.permission;
+        botao.disabled = permissao !== 'default';
+        botao.textContent =
+          permissao === 'granted'
+            ? 'Notificações ativas'
+            : permissao === 'denied'
+              ? 'Notificações bloqueadas'
+              : 'Ativar notificações';
+      }
+
+      // Pedido só no clique: navegadores ignoram (ou punem) pedido no carregamento
+      $('#btn-notificacoes').addEventListener('click', async () => {
+        await Notification.requestPermission();
+        atualizarBotaoNotificacao();
+        if (Notification.permission === 'granted') {
+          new Notification('Notificações ativadas', {
+            body: 'Você será avisado a cada intimação atribuída.',
+          });
+        }
+      });
+
+      function notificarNavegador(titulo, corpo, intimacaoId) {
+        if (!('Notification' in window) || Notification.permission !== 'granted') return;
+        const n = new Notification(titulo, { body: corpo, tag: 'intimacoes-djen' });
+        n.onclick = () => {
+          window.focus();
+          document
+            .querySelector(`.intim[data-id="${Number(intimacaoId)}"]`)
+            ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          n.close();
+        };
+      }
+
+      // Um sync pode atribuir 20 de uma vez: agrupamos em vez de abrir 20 alertas
+      let lote = [];
+      let timerLote;
+
+      function enfileirarAlerta(evento) {
+        lote.push(evento);
+        clearTimeout(timerLote);
+        timerLote = setTimeout(dispararAlertas, JANELA_ALERTAS_MS);
+      }
+
+      function dispararAlertas() {
+        const eventos = lote;
+        lote = [];
+        if (eventos.length === 0) return;
+
+        if (eventos.length === 1) {
+          const [e] = eventos;
+          const processo = mascararCNJ(e.numeroProcessoMascara);
+          toast('Nova intimação atribuída', `${processo} · ${e.siglaTribunal} → ${e.colaborador.nome}`, 'sucesso');
+          notificarNavegador('Nova intimação atribuída', `${processo} (${e.siglaTribunal})\nPara: ${e.colaborador.nome}`, e.id);
+          return;
+        }
+
+        const porColaborador = new Map();
+        for (const e of eventos) {
+          porColaborador.set(e.colaborador.nome, (porColaborador.get(e.colaborador.nome) ?? 0) + 1);
+        }
+        const resumo = [...porColaborador].map(([nome, n]) => `${nome} ${n}`).join(' · ');
+        const titulo = `${eventos.length} novas intimações atribuídas`;
+        toast(titulo, resumo, 'sucesso');
+        notificarNavegador(titulo, resumo, eventos.at(-1).id);
+      }
+
+      // ---------- SSE ----------
+      function indicarSse(conectado) {
+        estado.sseConectado = conectado;
+        $('#sse').className = `sse ${conectado ? 'sse--conectado' : 'sse--reconectando'}`;
+        $('#sse-texto').textContent = conectado ? 'Conectado' : 'Reconectando…';
+      }
+
+      function conectarSse() {
+        const fonte = new EventSource('/notificacoes/stream');
+        let caiu = false;
+
+        fonte.onopen = () => {
+          indicarSse(true);
+          // O servidor não reenvia o que se perdeu: ao voltar, recarregamos tudo
+          if (caiu) void carregarTudo();
+        };
+        // O EventSource reconecta sozinho; só mostramos o estado
+        fonte.onerror = () => {
+          caiu = true;
+          indicarSse(false);
+        };
+
+        fonte.addEventListener('intimacao.atribuida', (mensagem) => {
+          let evento;
+          try {
+            evento = JSON.parse(mensagem.data);
+          } catch {
+            return;
+          }
+          inserirOuAtualizar(evento, true);
+          atualizarFila(evento.colaborador.id, evento.tamanhoFila);
+          enfileirarAlerta(evento);
+        });
+      }
+
+      // ---------- Sincronizar ----------
+      $('#form-sync').addEventListener('submit', async (evento) => {
+        evento.preventDefault();
+        const botao = $('#btn-sync');
+        botao.disabled = true;
+        botao.textContent = 'Sincronizando…';
+        try {
+          const r = await api('/intimacoes/sync', {
+            method: 'POST',
+            body: JSON.stringify({
+              siglaTribunal: $('#sigla').value.trim().toUpperCase(),
+              dataDisponibilizacaoInicio: $('#data').value,
+              itensPorPagina: Number($('#quantidade').value),
+              maxPaginas: 1,
+            }),
+          });
+          const mock = r.origem === 'mock' ? ' · DJEN indisponível, dados do mock' : '';
+          toast(
+            'Sincronização concluída',
+            `${r.novas} ${plural(r.novas, 'nova', 'novas')} · ${r.duplicadas} já existiam${mock}`,
+            r.origem === 'mock' ? 'aviso' : 'info',
+          );
+          // Sem SSE os eventos não chegam: buscamos a lista na mão
+          if (!estado.sseConectado) await carregarTudo();
+        } catch (erro) {
+          toast('Falha ao sincronizar', erro.message, 'erro');
+        } finally {
+          botao.disabled = false;
+          botao.textContent = 'Sincronizar agora';
+        }
+      });
+
+      async function carregarTudo() {
+        try {
+          await Promise.all([carregarColaboradores(), carregarIntimacoes()]);
+        } catch (erro) {
+          toast('Falha ao carregar dados', erro.message, 'erro');
+        }
+      }
+
+      $('#data').value = ultimoDiaUtil();
+      atualizarBotaoNotificacao();
+      void carregarTudo();
+      conectarSse();
+    </script>
+  </body>
+</html>
